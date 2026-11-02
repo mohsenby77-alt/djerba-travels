@@ -1,0 +1,471 @@
+import React, { useState } from 'react';
+
+// المعرف المالي الخاص بك
+const AFFILIATE_MARKER = "794826";
+
+// الترجمات الكاملة للغات الثلاث
+const translations = {
+  fr: {
+    appName: "Djerba GO",
+    welcome: "Bienvenue à Djerba 🌴",
+    tagline: "Location de voitures & Réservation d'hôtels au meilleur prix",
+    tabAll: "Tout",
+    tabCars: "Voitures",
+    tabHotels: "Hôtels",
+    tabGuide: "Guide",
+    carsTitle: "Véhicules disponibles à Djerba",
+    hotelsTitle: "Hôtels & Riads de luxe à Djerba",
+    guideTitle: "Lieux incontournables 📍",
+    bookCar: "Réserver la voiture",
+    bookHotel: "Voir les disponibilités",
+    perDay: "/ jour",
+    perNight: "/ nuit",
+    airportDelivery: "Livraison à l'Aéroport DJE",
+    instantBooking: "Confirmation Immédiate",
+    searchMoreCars: "Voir toutes les voitures disponibles à l'aéroport ➔",
+    searchMoreHotels: "Voir tous les hôtels à Djerba ➔",
+    securityBadge: "Réservation 100% sécurisée - Partenaire Officiel",
+  },
+  en: {
+    appName: "Djerba GO",
+    welcome: "Welcome to Djerba 🌴",
+    tagline: "Car rentals & Hotel bookings at the best rates",
+    tabAll: "All",
+    tabCars: "Cars",
+    tabHotels: "Hotels",
+    tabGuide: "Guide",
+    carsTitle: "Available Cars in Djerba",
+    hotelsTitle: "Luxury Hotels & Resorts in Djerba",
+    guideTitle: "Top Attractions 📍",
+    bookCar: "Book Car",
+    bookHotel: "Check Availability",
+    perDay: "/ day",
+    perNight: "/ night",
+    airportDelivery: "DJE Airport Delivery",
+    instantBooking: "Instant Confirmation",
+    searchMoreCars: "View all available cars at the airport ➔",
+    searchMoreHotels: "View all hotels in Djerba ➔",
+    securityBadge: "100% Secure Booking - Official Partner",
+  },
+  ar: {
+    appName: "Djerba GO",
+    welcome: "مرحباً بكم في جربة 🌴",
+    tagline: "كراء السيارات وحجز النزل الفاخرة بأفضل الأسعار",
+    tabAll: "الكل",
+    tabCars: "السيارات",
+    tabHotels: "النزل",
+    tabGuide: "دليل الجزيرة",
+    carsTitle: "السيارات المتاحة في جربة",
+    hotelsTitle: "أرقى فنادق ونُزُل جزيرة جربة",
+    guideTitle: "معالم لا تفوتك في جربة 📍",
+    bookCar: "احجز السيارة الآن",
+    bookHotel: "تفقد التوافر والأسعار",
+    perDay: "/ يوم",
+    perNight: "/ ليلة",
+    airportDelivery: "تسليم مباشر في مطار جربة",
+    instantBooking: "تأكيد حجز فوري",
+    searchMoreCars: "عرض كافة السيارات المتاحة في المطار ➔",
+    searchMoreHotels: "عرض كافة نزل وفنادق جربة ➔",
+    securityBadge: "حجز آمن 100% - شركاء رسميون معتمدون",
+  }
+};
+
+// قائمة السيارات الحقيقية
+const carsData = [
+  {
+    id: 1,
+    name: "Renault Clio 5",
+    category: "Économique / Citadine",
+    price: "85 TND",
+    img: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=600&q=80",
+    features: ["Clim", "5 Places", "Manuel", "Essence"],
+  },
+  {
+    id: 2,
+    name: "Dacia Duster 4x4",
+    category: "SUV / Confort",
+    price: "150 TND",
+    img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80",
+    features: ["Clim", "5 Places", "Grand Coffre", "Diesel"],
+  },
+  {
+    id: 3,
+    name: "Hyundai i10",
+    category: "Compacte / Mini",
+    price: "75 TND",
+    img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80",
+    features: ["Clim", "4 Places", "Automatique", "Éco"],
+  },
+  {
+    id: 4,
+    name: "Fiat Tipo Sedan",
+    category: "Familiale Berline",
+    price: "110 TND",
+    img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80",
+    features: ["Clim", "5 Places", "Coffre Spacieux", "Essence"],
+  }
+];
+
+// قائمة الفنادق الحقيقية المصححة في جربة
+const hotelsData = [
+  {
+    id: 1,
+    name: "Hasdrubal Prestige Thalassa & Spa",
+    stars: "★★★★★",
+    location: "Plage Sidi Mahrez, Djerba",
+    price: "420 TND",
+    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80",
+    tag: "Thalasso de Luxe"
+  },
+  {
+    id: 2,
+    name: "Radisson Blu Resort & Thalasso",
+    stars: "★★★★★",
+    location: "Zone Touristique, Djerba",
+    price: "360 TND",
+    img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80",
+    tag: "Bord de Mer"
+  },
+  {
+    id: 3,
+    name: "Iberostar Mehari Djerba",
+    stars: "★★★★",
+    location: "Taguermess, Midoun",
+    price: "240 TND",
+    img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=600&q=80",
+    tag: "All Inclusive / Famille"
+  },
+  {
+    id: 4,
+    name: "Djerba Plaza Thalasso & Spa",
+    stars: "★★★★",
+    location: "Midoun, Djerba",
+    price: "210 TND",
+    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    tag: "Piscine & Jardin"
+  },
+  {
+    id: 5,
+    name: "Dar Dhiafa (Maison d'hôtes)",
+    stars: "Charme",
+    location: "Erriadh (Djerbahood)",
+    price: "280 TND",
+    img: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=600&q=80",
+    tag: "Authentique & Culturel"
+  }
+];
+
+// معالم جربة
+const guideData = [
+  { title: "Djerbahood", desc: "Village artistique d'Erriadh et fresques murales.", icon: "🎨" },
+  { title: "Plage Sidi Mahrez", desc: "Eaux turquoises et sable blanc fin.", icon: "🏖️" },
+  { title: "Musée de Guellala", desc: "Patrimoine, traditions et poteries artisanales.", icon: "🏺" },
+  { title: "Marché de Houmt Souk", desc: "Vente de poissons à la criée et souks typiques.", icon: "🛍️" },
+];
+
+export default function App() {
+  const [lang, setLang] = useState('fr');
+  const [activeTab, setActiveTab] = useState('all');
+
+  const t = translations[lang];
+  const isArabic = lang === 'ar';
+
+  const carAffiliateUrl = `https://www.discovercars.com/?marker=${AFFILIATE_MARKER}&destination=Djerba`;
+  const hotelAffiliateUrl = `https://hotellook.com/search/Djerba?marker=${AFFILIATE_MARKER}`;
+
+  return (
+    <div style={{
+      fontFamily: isArabic ? 'Tahoma, Arial, sans-serif' : 'system-ui, -apple-system, sans-serif',
+      direction: isArabic ? 'rtl' : 'ltr',
+      backgroundColor: '#F3F4F6',
+      minHeight: '100vh',
+      color: '#1F2937',
+      paddingBottom: '40px'
+    }}>
+      
+      {/* الشريط العلوي Header */}
+      <header style={{
+        backgroundColor: '#0F4C81',
+        color: '#FFFFFF',
+        padding: '16px 20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '24px' }}>🌴</span>
+          <span style={{ fontWeight: '800', fontSize: '20px', letterSpacing: '1px' }}>Djerba GO</span>
+        </div>
+
+        {/* أزرار اختيار اللغة */}
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {['fr', 'en', 'ar'].map((l) => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              style={{
+                backgroundColor: lang === l ? '#E5A93C' : 'rgba(255,255,255,0.15)',
+                color: lang === l ? '#000' : '#FFF',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              {l === 'fr' ? 'FR 🇫🇷' : l === 'en' ? 'EN 🇬🇧' : 'عربي 🇹🇳'}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* بنر الترحيب Hero Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0F4C81 0%, #1E3A8A 100%)',
+        color: 'white',
+        padding: '30px 20px',
+        borderBottomLeftRadius: '24px',
+        borderBottomRightRadius: '24px',
+        textAlign: 'center'
+      }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>{t.welcome}</h1>
+        <p style={{ fontSize: '13px', margin: 0, opacity: 0.9 }}>{t.tagline}</p>
+
+        {/* أزرار التبويب Tabs */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '8px',
+          marginTop: '20px'
+        }}>
+          {[
+            { id: 'all', label: t.tabAll },
+            { id: 'cars', label: t.tabCars },
+            { id: 'hotels', label: t.tabHotels },
+            { id: 'guide', label: t.tabGuide },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '20px',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                backgroundColor: activeTab === tab.id ? '#E5A93C' : 'rgba(255,255,255,0.2)',
+                color: activeTab === tab.id ? '#000' : '#FFF'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '16px' }}>
+
+        {/* قسم كراء السيارات Cars Section */}
+        {(activeTab === 'all' || activeTab === 'cars') && (
+          <div style={{ marginBottom: '30px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>🚗 {t.carsTitle}</h2>
+            </div>
+
+            <div style={{ display: 'grid', gap: '14px' }}>
+              {carsData.map((car) => (
+                <div key={car.id} style={{
+                  backgroundColor: 'white',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <img src={car.img} alt={car.name} style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
+                  <div style={{ padding: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0 }}>{car.name}</h3>
+                      <span style={{ color: '#0F4C81', fontWeight: 'bold', fontSize: '15px' }}>{car.price} <small style={{ fontSize: '11px', color: '#6B7280' }}>{t.perDay}</small></span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#6B7280', margin: '4px 0 10px 0' }}>{car.category}</p>
+                    
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                      {car.features.map((f, idx) => (
+                        <span key={idx} style={{ backgroundColor: '#F3F4F6', fontSize: '11px', padding: '3px 8px', borderRadius: '6px', color: '#4B5563' }}>
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+
+                    <a
+                      href={carAffiliateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'block',
+                        textAlign: 'center',
+                        backgroundColor: '#E5A93C',
+                        color: '#000',
+                        textDecoration: 'none',
+                        padding: '10px',
+                        borderRadius: '10px',
+                        fontWeight: 'bold',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {t.bookCar}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href={carAffiliateUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'block',
+                textAlign: 'center',
+                marginTop: '12px',
+                color: '#0F4C81',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                textDecoration: 'none'
+              }}
+            >
+              {t.searchMoreCars}
+            </a>
+          </div>
+        )}
+
+        {/* قسم الفنادق Hotels Section */}
+        {(activeTab === 'all' || activeTab === 'hotels') && (
+          <div style={{ marginBottom: '30px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '14px' }}>🏨 {t.hotelsTitle}</h2>
+
+            <div style={{ display: 'grid', gap: '14px' }}>
+              {hotelsData.map((hotel) => (
+                <div key={hotel.id} style={{
+                  backgroundColor: 'white',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                }}>
+                  <div style={{ position: 'relative' }}>
+                    <img src={hotel.img} alt={hotel.name} style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
+                    <span style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: isArabic ? 'auto' : '10px',
+                      left: isArabic ? '10px' : 'auto',
+                      backgroundColor: 'rgba(15, 76, 129, 0.85)',
+                      color: 'white',
+                      fontSize: '10px',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontWeight: 'bold'
+                    }}>
+                      {hotel.tag}
+                    </span>
+                  </div>
+
+                  <div style={{ padding: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 'bold', margin: 0 }}>{hotel.name}</h3>
+                      <span style={{ color: '#E5A93C', fontSize: '12px' }}>{hotel.stars}</span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#6B7280', margin: '4px 0 8px 0' }}>📍 {hotel.location}</p>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                      <span style={{ color: '#0F4C81', fontWeight: 'bold', fontSize: '15px' }}>
+                        {hotel.price} <small style={{ fontSize: '11px', color: '#6B7280' }}>{t.perNight}</small>
+                      </span>
+
+                      <a
+                        href={hotelAffiliateUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          backgroundColor: '#0F4C81',
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: '8px 14px',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '12px'
+                        }}
+                      >
+                        {t.bookHotel}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href={hotelAffiliateUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'block',
+                textAlign: 'center',
+                marginTop: '12px',
+                color: '#0F4C81',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                textDecoration: 'none'
+              }}
+            >
+              {t.searchMoreHotels}
+            </a>
+          </div>
+        )}
+
+        {/* قسم دليل جربة السياحي Guide Section */}
+        {(activeTab === 'all' || activeTab === 'guide') && (
+          <div style={{ marginBottom: '25px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '14px' }}>{t.guideTitle}</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {guideData.map((place, index) => (
+                <div key={index} style={{
+                  backgroundColor: 'white',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                }}>
+                  <span style={{ fontSize: '24px' }}>{place.icon}</span>
+                  <h4 style={{ fontSize: '13px', fontWeight: 'bold', margin: '6px 0 2px 0' }}>{place.title}</h4>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: 0 }}>{place.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* شارة الأمان والضمان */}
+        <div style={{
+          backgroundColor: '#ECFDF5',
+          border: '1px solid #A7F3D0',
+          borderRadius: '12px',
+          padding: '12px',
+          textAlign: 'center',
+          fontSize: '12px',
+          color: '#065F46',
+          fontWeight: 'bold'
+        }}>
+          🛡️ {t.securityBadge}
+        </div>
+
+      </div>
+    </div>
+  );
+}
